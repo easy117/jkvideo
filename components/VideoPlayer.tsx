@@ -13,9 +13,11 @@ interface Props {
   currentQn: number;
   onQualityChange: (qn: number) => void;
   onMiniPlayer?: () => void;
+  onProgress?: (currentTime: number, duration: number) => void;
+  seekTo?: { t: number; v: number };
 }
 
-export function VideoPlayer({ playData, qualities, currentQn, onQualityChange, onMiniPlayer }: Props) {
+export function VideoPlayer({ playData, qualities, currentQn, onQualityChange, onMiniPlayer, onProgress, seekTo }: Props) {
   const [fullscreen, setFullscreen] = useState(false);
 
   if (!playData) {
@@ -49,6 +51,8 @@ export function VideoPlayer({ playData, qualities, currentQn, onQualityChange, o
         onQualityChange={onQualityChange}
         onFullscreen={() => setFullscreen(true)}
         onMiniPlayer={onMiniPlayer}
+        onProgress={onProgress}
+        seekTo={seekTo}
       />
 
       <Modal visible={fullscreen} animationType="fade" statusBarTranslucent>
@@ -61,6 +65,8 @@ export function VideoPlayer({ playData, qualities, currentQn, onQualityChange, o
             onQualityChange={onQualityChange}
             onFullscreen={() => setFullscreen(false)}
             style={{ width: '100%', height: '100%' } as any}
+            onProgress={onProgress}
+            seekTo={seekTo}
           />
           <TouchableOpacity style={styles.closeBtn} onPress={() => setFullscreen(false)}>
             <Ionicons name="close" size={28} color="#fff" />

@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { VideoPlayer } from '../../components/VideoPlayer';
+import { HeatProgressBar } from '../../components/HeatProgressBar';
 import { CommentItem } from '../../components/CommentItem';
 import { useVideoDetail } from '../../hooks/useVideoDetail';
 import { useComments } from '../../hooks/useComments';
@@ -21,6 +22,9 @@ export default function VideoDetailScreen() {
   const { video, playData, loading: videoLoading, qualities, currentQn, changeQuality } = useVideoDetail(bvid as string);
   const { comments, loading: cmtLoading, load: loadComments } = useComments(video?.aid ?? 0);
   const [tab, setTab] = useState<Tab>('comments');
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [seekCmd, setSeekCmd] = useState<{ t: number; v: number } | undefined>();
   const { setVideo, clearVideo } = useVideoStore();
 
   useEffect(() => {
@@ -56,7 +60,19 @@ export default function VideoDetailScreen() {
         currentQn={currentQn}
         onQualityChange={changeQuality}
         onMiniPlayer={handleMiniPlayer}
+        onProgress={(ct, dur) => { setCurrentTime(ct); setDuration(dur); }}
+        seekTo={seekCmd}
       />
+
+      {video?.cid && duration > 0 && (
+        <HeatProgressBar
+          bvid={bvid as string}
+          cid={video.cid}
+          currentTime={currentTime}
+          duration={duration}
+          onSeek={(t) => setSeekCmd(s => ({ t, v: (s?.v ?? 0) + 1 }))}
+        />
+      )}
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         {videoLoading ? (
