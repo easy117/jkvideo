@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
   View, StyleSheet,
-  Text, TouchableOpacity, ActivityIndicator, Animated, Image,
+  Text, TouchableOpacity, ActivityIndicator, Animated, Image, RefreshControl,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -54,8 +54,13 @@ export default function HomeScreen() {
         columnWrapperStyle={styles.row}
         contentContainerStyle={{ paddingTop: insets.top + NAV_H + 8, paddingBottom: insets.bottom + 16 }}
         renderItem={renderItem}
-        onRefresh={refresh}
-        refreshing={refreshing}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refresh}
+            progressViewOffset={insets.top + NAV_H}
+          />
+        }
         onEndReached={() => load()}
         onEndReachedThreshold={0.5}
         ListFooterComponent={
