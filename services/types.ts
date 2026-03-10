@@ -35,8 +35,8 @@ export interface Comment {
 }
 
 export interface DashSegmentBase {
-  Initialization: string;
-  indexRange: string;
+  initialization: string;
+  index_range: string;
 }
 
 export interface DashVideoItem {
@@ -48,7 +48,7 @@ export interface DashVideoItem {
   width: number;
   height: number;
   frameRate: string;
-  segmentBase: DashSegmentBase;
+  segment_base?: DashSegmentBase;
 }
 
 export interface DashAudioItem {
@@ -57,7 +57,7 @@ export interface DashAudioItem {
   bandwidth: number;
   mimeType: string;
   codecs: string;
-  segmentBase: DashSegmentBase;
+  segment_base?: DashSegmentBase;
 }
 
 export interface PlayUrlResponse {

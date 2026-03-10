@@ -15,6 +15,16 @@ export function buildDashDataUri(playData: PlayUrlResponse, qn: number): string 
 
   const dur = dash.duration;
 
+  const vSeg = video.segment_base;
+  const aSeg = audio.segment_base;
+
+  const videoSegmentBase = vSeg
+    ? `\n        <SegmentBase indexRange="${vSeg.index_range}">\n          <Initialization range="${vSeg.initialization}"/>\n        </SegmentBase>`
+    : '';
+  const audioSegmentBase = aSeg
+    ? `\n        <SegmentBase indexRange="${aSeg.index_range}">\n          <Initialization range="${aSeg.initialization}"/>\n        </SegmentBase>`
+    : '';
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <MPD xmlns="urn:mpeg:dash:schema:mpd:2011"
      profiles="urn:mpeg:dash:profile:isoff-on-demand:2011"
@@ -23,18 +33,12 @@ export function buildDashDataUri(playData: PlayUrlResponse, qn: number): string 
   <Period duration="PT${dur}S">
     <AdaptationSet id="1" mimeType="${video.mimeType}" codecs="${video.codecs}" startWithSAP="1" subsegmentAlignment="true">
       <Representation id="v1" bandwidth="${video.bandwidth}" width="${video.width}" height="${video.height}" frameRate="${video.frameRate}">
-        <BaseURL>${escapeXml(video.baseUrl)}</BaseURL>
-        <SegmentBase indexRange="${video.segmentBase.indexRange}">
-          <Initialization range="${video.segmentBase.Initialization}"/>
-        </SegmentBase>
+        <BaseURL>${escapeXml(video.baseUrl)}</BaseURL>${videoSegmentBase}
       </Representation>
     </AdaptationSet>
     <AdaptationSet id="2" mimeType="${audio.mimeType}" codecs="${audio.codecs}" startWithSAP="1" subsegmentAlignment="true">
       <Representation id="a1" bandwidth="${audio.bandwidth}">
-        <BaseURL>${escapeXml(audio.baseUrl)}</BaseURL>
-        <SegmentBase indexRange="${audio.segmentBase.indexRange}">
-          <Initialization range="${audio.segmentBase.Initialization}"/>
-        </SegmentBase>
+        <BaseURL>${escapeXml(audio.baseUrl)}</BaseURL>${audioSegmentBase}
       </Representation>
     </AdaptationSet>
   </Period>
