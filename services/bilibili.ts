@@ -76,12 +76,14 @@ export async function getRecommendFeed(freshIdx = 0): Promise<VideoItem[]> {
   );
   const res = await api.get('/x/web-interface/wbi/index/top/feed/rcmd', { params: signed });
   const items: any[] = res.data.data?.item ?? [];
-  return items.map(item => ({
-    ...item,
-    aid: item.id ?? item.aid,
-    pic: item.pic ?? item.cover,
-    owner: item.owner ?? { mid: 0, name: item.owner_info?.name ?? '', face: item.owner_info?.face ?? '' },
-  })) as VideoItem[];
+  return items
+    .map(item => ({
+      ...item,
+      aid: item.id ?? item.aid,
+      pic: item.pic ?? item.cover,
+      owner: item.owner ?? { mid: 0, name: item.owner_info?.name ?? '', face: item.owner_info?.face ?? '' },
+    }))
+    .filter((item: any) => item.bvid && (item.pic || item.cover) && item.duration > 0) as VideoItem[];
 }
 
 export async function getPopularVideos(pn = 1): Promise<VideoItem[]> {
