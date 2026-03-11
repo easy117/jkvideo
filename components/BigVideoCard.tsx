@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, Image, TouchableOpacity, StyleSheet,
-  Dimensions, Animated,
+  useWindowDimensions, Animated,
 } from 'react-native';
 import Video from 'react-native-video';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,9 +11,6 @@ import { getPlayUrl, getVideoDetail } from '../services/bilibili';
 import { proxyImageUrl } from '../utils/imageUrl';
 import { formatCount, formatDuration } from '../utils/format';
 import type { VideoItem } from '../services/types';
-
-const { width: SCREEN_W } = Dimensions.get('window');
-const THUMB_H = SCREEN_W * 0.5625; // 16:9
 
 const HEADERS = {
   Referer: 'https://www.bilibili.com',
@@ -28,10 +25,21 @@ interface Props {
 }
 
 export function BigVideoCard({ item, isVisible, onPress }: Props) {
+  const { width: SCREEN_W } = useWindowDimensions();
+  const THUMB_H = SCREEN_W * 0.5625;
+
   const [videoUrl, setVideoUrl] = useState<string | undefined>();
   const [isDash, setIsDash] = useState(false);
   const [paused, setPaused] = useState(true);
   const thumbOpacity = useRef(new Animated.Value(1)).current;
+
+  // Reset video state when the item changes
+  useEffect(() => {
+    setVideoUrl(undefined);
+    setIsDash(false);
+    setPaused(true);
+    thumbOpacity.setValue(1);
+  }, [item.bvid]);
 
   // Fetch play URL when visible for the first time
   useEffect(() => {
@@ -64,7 +72,7 @@ export function BigVideoCard({ item, isVisible, onPress }: Props) {
         console.warn('BigVideoCard: failed to load play URL', e);
       }
     })();
-  }, [isVisible]);
+  }, [isVisible, item.bvid]);
 
   // Pause/resume when visibility changes
   useEffect(() => {
@@ -77,6 +85,7 @@ export function BigVideoCard({ item, isVisible, onPress }: Props) {
   }, [isVisible, videoUrl]);
 
   const handleVideoReady = () => {
+    if (!isVisible) return;
     setPaused(false);
     Animated.timing(thumbOpacity, {
       toValue: 0,
@@ -88,12 +97,12 @@ export function BigVideoCard({ item, isVisible, onPress }: Props) {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
       {/* Media area */}
-      <View style={styles.mediaContainer}>
+      <View style={{ width: SCREEN_W - 8, height: THUMB_H, position: 'relative' }}>
         {/* Thumbnail */}
         <Animated.View style={[StyleSheet.absoluteFill, { opacity: thumbOpacity }]}>
           <Image
             source={{ uri: proxyImageUrl(item.pic) }}
-            style={styles.thumb}
+            style={{ width: SCREEN_W - 8, height: THUMB_H }}
             resizeMode="cover"
           />
         </Animated.View>
@@ -142,14 +151,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 6,
     overflow: 'hidden',
-  },
-  mediaContainer: {
-    width: SCREEN_W - 8,
-    height: THUMB_H,
-  },
-  thumb: {
-    width: SCREEN_W - 8,
-    height: THUMB_H,
   },
   durationBadge: {
     position: 'absolute',
