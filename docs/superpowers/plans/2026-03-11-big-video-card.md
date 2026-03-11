@@ -356,7 +356,13 @@ const onViewableItemsChangedRef = useRef(
 ).current;
 ```
 
-- [ ] **Step 4: Replace `renderItem` with a row-aware version**
+- [ ] **Step 4: Replace `renderItem` with a row-aware version and remove stale import**
+
+After replacing `renderItem`, `VideoItem` is no longer directly referenced in `app/index.tsx`. Remove the now-unused import:
+```ts
+// Remove this line:
+import type { VideoItem } from "../services/types";
+```
 
 Replace the existing `renderItem` function:
 ```ts
@@ -402,6 +408,8 @@ row: { flexDirection: 'row', paddingHorizontal: 1, justifyContent: "flex-start" 
 ```
 
 - [ ] **Step 6: Update the FlatList props**
+
+**Important:** Apply Step 4 (new `renderItem`) before or simultaneously with this step. Removing `numColumns` while the old `renderItem` (which relies on `numColumns` to pair items via `index % 2`) is still in place will break layout mid-edit.
 
 In the `Animated.FlatList`, make these changes:
 
