@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import {
   View,
   StyleSheet,
@@ -40,18 +46,20 @@ export default function HomeScreen() {
   const rows = useMemo(() => toListRows(videos), [videos]);
 
   // useRef-wrapped to satisfy FlatList's requirement that onViewableItemsChanged never changes identity after mount
+  //
   const onViewableItemsChangedRef = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
       const bigRow = viewableItems.find(
-        (v) => v.item && (v.item as ListRow).type === 'big',
+        (v) => v.item && (v.item as ListRow).type === "big",
       );
-      setVisibleBigKey(
-        bigRow ? (bigRow.item as BigRow).item.bvid : null,
-      );
+      setVisibleBigKey(bigRow ? (bigRow.item as BigRow).item.bvid : null);
     },
   ).current;
 
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  
+
   const headerTranslate = scrollY.interpolate({
     inputRange: [0, NAV_H],
     outputRange: [0, -NAV_H],
@@ -62,8 +70,16 @@ export default function HomeScreen() {
     load();
   }, []);
 
+  const onScroll = useMemo(
+    () =>
+      Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+        useNativeDriver: true,
+      }),
+    [],
+  );
+
   const renderItem = useCallback(({ item: row }: { item: ListRow }) => {
-    if (row.type === 'big') {
+    if (row.type === "big") {
       return (
         <BigVideoCard
           item={row.item}
@@ -92,7 +108,7 @@ export default function HomeScreen() {
         )}
       </View>
     );
-  }, [visibleBigKey]);
+  }, []);
 
   return (
     <SafeAreaView style={styles.safe} edges={["left", "right"]}>
@@ -100,9 +116,9 @@ export default function HomeScreen() {
         style={styles.listContainer}
         data={rows}
         keyExtractor={(row: any) =>
-          row.type === 'big'
+          row.type === "big"
             ? `big-${row.item.bvid}`
-            : `pair-${row.left.bvid}-${row.right?.bvid ?? 'empty'}`
+            : `pair-${row.left.bvid}-${row.right?.bvid ?? "empty"}`
         }
         contentContainerStyle={{
           paddingTop: insets.top + NAV_H + 6,
@@ -126,13 +142,9 @@ export default function HomeScreen() {
             {loading && <ActivityIndicator color="#00AEEC" />}
           </View>
         }
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true },
-        )}
+        onScroll={onScroll}
         scrollEventThrottle={16}
       />
-
       {/* 绝对定位导航栏：paddingTop 手动适配刘海/状态栏 */}
       <Animated.View
         style={[
@@ -236,7 +248,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#00AEEC",
     borderRadius: 1,
   },
-  row: { flexDirection: 'row', paddingHorizontal: 1, justifyContent: "flex-start" },
+  row: {
+    flexDirection: "row",
+    paddingHorizontal: 1,
+    justifyContent: "flex-start",
+  },
   leftCol: { marginLeft: 4, marginRight: 2 },
   rightCol: { marginLeft: 2, marginRight: 4 },
   footer: { height: 48, alignItems: "center", justifyContent: "center" },

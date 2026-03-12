@@ -184,29 +184,29 @@ export async function getDanmaku(cid: number): Promise<DanmakuItem[]> {
       return parseDanmakuXml(res.data);
     }
 
-    // Native 策略 1：responseType: 'text'，依赖 OkHttp 自动解压
+    // Native：arraybuffer + 逐一尝试解压（服务器强制压缩，无法避免）
     const res = await axios.get(`${COMMENT_BASE}/${cid}.xml`, {
-      headers: { Referer: 'https://www.bilibili.com', 'User-Agent': UA },
-      responseType: 'text',
-    });
-
-    if (typeof res.data === 'string' && res.data.includes('<d ')) {
-      return parseDanmakuXml(res.data);
-    }
-
-    // 策略 2 回退：arraybuffer + pako 手动解压
-    const res2 = await axios.get(`${COMMENT_BASE}/${cid}.xml`, {
       headers: { Referer: 'https://www.bilibili.com', 'User-Agent': UA },
       responseType: 'arraybuffer',
     });
 
-    const bytes = new Uint8Array(res2.data as ArrayBuffer);
-    let xmlText: string;
-    if (bytes[0] === 0x1f && bytes[1] === 0x8b) {
-      xmlText = pako.inflate(bytes, { to: 'string' });
-    } else {
+  const bytes = new Uint8Array(res.data as ArrayBuffer);
+    let xmlText: string | undefined;
+
+    // 依次尝试：inflate (gzip/zlib) → inflateRaw (raw deflate)
+    for (const fn of [pako.inflate, pako.inflateRaw] as Array<(input: Uint8Array, opts: pako.InflateOptions) => string>) {
+      try {
+        xmlText = fn(bytes, { to: 'string' });
+        if (xmlText.includes('<d ')) break;
+        xmlText = undefined;
+      } catch { /* 继续尝试下一种 */ }
+    }
+
+    if (!xmlText) {
+      // 最后尝试当作明文
       xmlText = new TextDecoder('utf-8').decode(bytes);
     }
+
     return parseDanmakuXml(xmlText);
   } catch (e) {
     console.warn('getDanmaku failed:', e);
