@@ -27,6 +27,14 @@ export default function RootLayout() {
               gestureDirection: "horizontal",
             }}
           />
+          <Stack.Screen
+            name="live"
+            options={{
+              animation: "slide_from_right",
+              gestureEnabled: true,
+              gestureDirection: "horizontal",
+            }}
+          />
         </Stack>
         <MiniPlayer />
       </View>

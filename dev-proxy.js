@@ -57,6 +57,7 @@ function makeProxy(targetHost) {
 
 app.use('/bilibili-api',      makeProxy('api.bilibili.com'));
 app.use('/bilibili-passport', makeProxy('passport.bilibili.com'));
+app.use('/bilibili-live',     makeProxy('api.live.bilibili.com'));
 
 // Dedicated comment proxy: buffer response and decompress by magic bytes (not Content-Encoding header)
 app.use('/bilibili-comment', (req, res) => {

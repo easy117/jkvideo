@@ -130,3 +130,27 @@ export interface LiveRoom {
   area_name: string;
   parent_area_name: string;
 }
+
+export interface LiveRoomDetail {
+  roomid: number;
+  uid: number;
+  title: string;
+  description: string;
+  live_status: number; // 1=直播中, 0=未开播
+  online: number;
+  area_name: string;
+  parent_area_name: string;
+  keyframe: string;
+}
+
+export interface LiveAnchorInfo {
+  uid: number;
+  uname: string;
+  face: string;
+}
+
+export interface LiveStreamInfo {
+  hlsUrl: string;
+  flvUrl: string;
+  qn: number;
+}

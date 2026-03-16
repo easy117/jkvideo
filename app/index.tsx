@@ -17,7 +17,6 @@ import {
   ViewToken,
   FlatList,
   ScrollView,
-  Linking,
 } from "react-native";
 import PagerView from "react-native-pager-view";
 import {
@@ -214,9 +213,7 @@ export default function HomeScreen() {
               isLivePulse
               item={row.left}
               fullWidth
-              onPress={() =>
-                Linking.openURL(`https://live.bilibili.com/${row.left.roomid}`)
-              }
+              onPress={() => router.push(`/live/${row.left.roomid}` as any)}
             />
           </View>
         );
@@ -248,11 +245,17 @@ export default function HomeScreen() {
     ({ item }: { item: { left: LiveRoom; right?: LiveRoom } }) => (
       <View style={styles.row}>
         <View style={styles.leftCol}>
-          <LiveCard item={item.left} />
+          <LiveCard
+            item={item.left}
+            onPress={() => router.push(`/live/${item.left.roomid}` as any)}
+          />
         </View>
         {item.right && (
           <View style={styles.rightCol}>
-            <LiveCard item={item.right} />
+            <LiveCard
+              item={item.right}
+              onPress={() => router.push(`/live/${item.right!.roomid}` as any)}
+            />
           </View>
         )}
       </View>

@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import pako from 'pako';
-import type { VideoItem, Comment, PlayUrlResponse, QRCodeInfo, VideoShotData, DanmakuItem, LiveRoom } from './types';
+import type { VideoItem, Comment, PlayUrlResponse, QRCodeInfo, VideoShotData, DanmakuItem, LiveRoom, LiveRoomDetail, LiveAnchorInfo, LiveStreamInfo } from './types';
 import { signWbi } from '../utils/wbi';
 import { parseDanmakuXml } from '../utils/danmaku';
 
@@ -242,6 +242,58 @@ export async function getLiveList(page = 1, parentAreaId = 0): Promise<LiveRoom[
     area_name: item.area_v2_name ?? item.areaName ?? '',
     parent_area_name: item.area_v2_parent_name ?? item.parentAreaName ?? '',
   }));
+}
+
+export async function getLiveRoomDetail(roomId: number): Promise<LiveRoomDetail> {
+  const res = await api.get(`${LIVE_BASE}/room/v1/Room/get_info`, {
+    params: { room_id: roomId },
+  });
+  return res.data.data as LiveRoomDetail;
+}
+
+export async function getLiveAnchorInfo(roomId: number): Promise<LiveAnchorInfo> {
+  const res = await api.get(`${LIVE_BASE}/live_user/v1/UserInfo/get_anchor_in_room`, {
+    params: { roomid: roomId },
+  });
+  const info = res.data.data?.info ?? {};
+  return { uid: info.uid, uname: info.uname, face: info.face } as LiveAnchorInfo;
+}
+
+export async function getLiveStreamUrl(roomId: number): Promise<LiveStreamInfo> {
+  try {
+    const res = await api.get(`${LIVE_BASE}/xlive/web-room/v2/index/getRoomPlayInfo`, {
+      params: { room_id: roomId, protocol: '0,1', format: '0,1,2', codec: '0', qn: 10000 },
+    });
+    const streams: any[] = res.data?.data?.playurl_info?.playurl?.stream ?? [];
+    let hlsUrl = '';
+    let flvUrl = '';
+    let qn = 0;
+
+    const hlsStream = streams.find(s => s.protocol_name === 'http_hls');
+    if (hlsStream) {
+      const fmt = hlsStream.format?.find((f: any) => f.format_name === 'fmp4') ?? hlsStream.format?.[0];
+      const codec = fmt?.codec?.find((c: any) => c.codec_name === 'avc') ?? fmt?.codec?.[0];
+      const urlInfo = codec?.url_info?.[0];
+      if (urlInfo) {
+        hlsUrl = urlInfo.host + codec.base_url;
+        qn = codec.current_qn ?? 0;
+      }
+    }
+
+    const flvStream = streams.find(s => s.protocol_name === 'http_stream');
+    if (flvStream) {
+      const fmt = flvStream.format?.[0];
+      const codec = fmt?.codec?.find((c: any) => c.codec_name === 'avc') ?? fmt?.codec?.[0];
+      const urlInfo = codec?.url_info?.[0];
+      if (urlInfo) {
+        flvUrl = urlInfo.host + codec.base_url;
+      }
+    }
+
+    return { hlsUrl, flvUrl, qn };
+  } catch {
+    return { hlsUrl: '', flvUrl: '', qn: 0 };
+  }
 }
 
 export async function getDanmaku(cid: number): Promise<DanmakuItem[]> {
