@@ -99,21 +99,38 @@ export default function VideoDetailScreen() {
       {/* TabBar — sits directly below player, always visible once video loads */}
       {video && (
         <View style={styles.tabBar}>
-          <TouchableOpacity style={styles.tabItem} onPress={() => setTab("intro")}>
-            <Text style={[styles.tabLabel, tab === "intro" && styles.tabActive]}>
+          <TouchableOpacity
+            style={styles.tabItem}
+            onPress={() => setTab("intro")}
+          >
+            <Text
+              style={[styles.tabLabel, tab === "intro" && styles.tabActive]}
+            >
               简介
             </Text>
             {tab === "intro" && <View style={styles.tabUnderline} />}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.tabItem} onPress={() => setTab("comments")}>
-            <Text style={[styles.tabLabel, tab === "comments" && styles.tabActive]}>
-              评论{video.stat?.reply > 0 ? ` ${formatCount(video.stat.reply)}` : ""}
+          <TouchableOpacity
+            style={styles.tabItem}
+            onPress={() => setTab("comments")}
+          >
+            <Text
+              style={[styles.tabLabel, tab === "comments" && styles.tabActive]}
+            >
+              评论
+              {video.stat?.reply > 0 ? ` ${formatCount(video.stat.reply)}` : ""}
             </Text>
             {tab === "comments" && <View style={styles.tabUnderline} />}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.tabItem} onPress={() => setTab("danmaku")}>
-            <Text style={[styles.tabLabel, tab === "danmaku" && styles.tabActive]}>
-              弹幕{danmakus.length > 0 ? ` ${formatCount(danmakus.length)}` : ""}
+          <TouchableOpacity
+            style={styles.tabItem}
+            onPress={() => setTab("danmaku")}
+          >
+            <Text
+              style={[styles.tabLabel, tab === "danmaku" && styles.tabActive]}
+            >
+              弹幕
+              {danmakus.length > 0 ? ` ${formatCount(danmakus.length)}` : ""}
             </Text>
             {tab === "danmaku" && <View style={styles.tabUnderline} />}
           </TouchableOpacity>
@@ -126,16 +143,10 @@ export default function VideoDetailScreen() {
       ) : video ? (
         tab === "intro" ? (
           // 简介：视频信息 + 合集 + 简介文本
-          <ScrollView style={styles.tabScroll} showsVerticalScrollIndicator={false}>
-            <View style={styles.titleSection}>
-              <Text style={styles.title}>{video.title}</Text>
-              <View style={styles.statsRow}>
-                <StatBadge icon="play" count={video.stat.view} />
-                <StatBadge icon="heart" count={video.stat.like} />
-                <StatBadge icon="star" count={video.stat.favorite} />
-                <StatBadge icon="chatbubble" count={video.stat.reply} />
-              </View>
-            </View>
+          <ScrollView
+            style={styles.tabScroll}
+            showsVerticalScrollIndicator={false}
+          >
             <View style={styles.upRow}>
               <Image
                 source={{ uri: proxyImageUrl(video.owner.face) }}
@@ -145,6 +156,15 @@ export default function VideoDetailScreen() {
               <TouchableOpacity style={styles.followBtn}>
                 <Text style={styles.followTxt}>+ 关注</Text>
               </TouchableOpacity>
+            </View>
+            <View style={styles.titleSection}>
+              <Text style={styles.title}>{video.title}</Text>
+              <View style={styles.statsRow}>
+                <StatBadge icon="play" count={video.stat.view} />
+                <StatBadge icon="heart" count={video.stat.like} />
+                <StatBadge icon="star" count={video.stat.favorite} />
+                <StatBadge icon="chatbubble" count={video.stat.reply} />
+              </View>
             </View>
             {video.ugc_season && (
               <SeasonSection
@@ -171,23 +191,45 @@ export default function VideoDetailScreen() {
             data={comments}
             keyExtractor={(c) => String(c.rpid)}
             renderItem={({ item }) => <CommentItem item={item} />}
-            onEndReached={() => { if (cmtHasMore && !cmtLoading) loadComments(); }}
+            onEndReached={() => {
+              if (cmtHasMore && !cmtLoading) loadComments();
+            }}
             onEndReachedThreshold={0.3}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={
               <View style={styles.sortRow}>
                 <Text style={styles.sortLabel}>排序</Text>
                 <TouchableOpacity
-                  style={[styles.sortBtn, commentSort === 2 && styles.sortBtnActive]}
+                  style={[
+                    styles.sortBtn,
+                    commentSort === 2 && styles.sortBtnActive,
+                  ]}
                   onPress={() => setCommentSort(2)}
                 >
-                  <Text style={[styles.sortBtnTxt, commentSort === 2 && styles.sortBtnTxtActive]}>热门</Text>
+                  <Text
+                    style={[
+                      styles.sortBtnTxt,
+                      commentSort === 2 && styles.sortBtnTxtActive,
+                    ]}
+                  >
+                    热门
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.sortBtn, commentSort === 0 && styles.sortBtnActive]}
+                  style={[
+                    styles.sortBtn,
+                    commentSort === 0 && styles.sortBtnActive,
+                  ]}
                   onPress={() => setCommentSort(0)}
                 >
-                  <Text style={[styles.sortBtnTxt, commentSort === 0 && styles.sortBtnTxtActive]}>最新</Text>
+                  <Text
+                    style={[
+                      styles.sortBtnTxt,
+                      commentSort === 0 && styles.sortBtnTxtActive,
+                    ]}
+                  >
+                    最新
+                  </Text>
                 </TouchableOpacity>
               </View>
             }
@@ -312,9 +354,13 @@ const styles = StyleSheet.create({
   },
   miniBtn: { padding: 4 },
   loader: { marginVertical: 30 },
-  titleSection: { padding: 14 },
+  titleSection: {
+    padding: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#f0f0f0",
+  },
   title: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: "600",
     color: "#212121",
     lineHeight: 22,
@@ -326,20 +372,19 @@ const styles = StyleSheet.create({
   upRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 14,
-    paddingBottom: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#f0f0f0",
+    paddingHorizontal: 10,
+    paddingBottom: 0,
+    paddingTop: 12,
   },
-  avatar: { width: 38, height: 38, borderRadius: 19, marginRight: 10 },
+  avatar: { width: 48, height: 48, borderRadius: 19, marginRight: 10 },
   upName: { flex: 1, fontSize: 14, color: "#212121", fontWeight: "500" },
   followBtn: {
     backgroundColor: "#00AEEC",
-    paddingHorizontal: 14,
-    paddingVertical: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: 14,
   },
-  followTxt: { color: "#fff", fontSize: 12, fontWeight: "600" },
+  followTxt: { color: "#fff", fontSize: 12, fontWeight: "500" },
   seasonBox: {
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: "#f0f0f0",
@@ -384,8 +429,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     position: "relative",
   },
-  tabLabel: { fontSize: 14, color: "#999" },
-  tabActive: { color: "#00AEEC", fontWeight: "700" },
+  tabLabel: { fontSize: 13, color: "#999" },
+  tabActive: { color: "#00AEEC" },
   tabUnderline: {
     position: "absolute",
     bottom: 0,

@@ -432,7 +432,9 @@ export default function HomeScreen() {
             <Ionicons name="search" size={14} color="#999" />
             <Text style={styles.searchPlaceholder}>搜索视频、UP主...</Text>
           </TouchableOpacity>
-          <Text style={styles.logo}>哔</Text>
+          <TouchableOpacity style={styles.downloadBtn} activeOpacity={0.7}>
+            <Ionicons name="cloud-download-outline" size={24} color="#999" />
+          </TouchableOpacity>
         </Animated.View>
 
         <View style={styles.tabRow}>
@@ -506,6 +508,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     gap: 5,
   },
+  downloadBtn: {},
   searchPlaceholder: {
     fontSize: 13,
     color: "#999",

@@ -30,8 +30,9 @@ export default function LiveDetailScreen() {
   const qualities = stream?.qualities ?? [];
   const currentQn = stream?.qn ?? 0;
 
-  const danmakus = useLiveDanmaku(isLive ? id : 0);
-
+  // Use actual roomid from room detail (not the short/alias ID from the URL)
+  const actualRoomId = room?.roomid ?? id;
+  const danmakus = useLiveDanmaku(isLive ? actualRoomId : 0);
   return (
     <SafeAreaView style={styles.safe}>
       {/* TopBar */}

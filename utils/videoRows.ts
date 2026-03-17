@@ -39,22 +39,29 @@ export function toListRows(pages: VideoItem[][], liveRooms?: LiveRoom[]): ListRo
 
     const pairs: (NormalRow | LiveRow)[] = [];
     for (let i = 0; i < rest.length; i += 2) {
-      pairs.push({ type: 'pair', left: rest[i], right: rest[i + 1] ?? null });
+      if (rest[i + 1]) {
+        pairs.push({ type: 'pair', left: rest[i], right: rest[i + 1] ?? null });
+      }
     }
 
-    // Inject 1 LiveRow per chunk at a deterministic position (seed = first video aid)
-    if (liveRooms && roomIdx < liveRooms.length && pairs.length > 0) {
-      const seed = chunk[0]?.aid ?? 0;
-      const insertAt = seed % (pairs.length + 1);
-      pairs.splice(insertAt, 0, {
-        type: 'live',
-        left: liveRooms[roomIdx],
-      });
-      roomIdx++;
-    }
 
-    rows.push({ type: 'big', item: bigItem });
-    rows.push(...pairs);
+
+    // if (liveRooms && roomIdx < liveRooms.length && pairs.length > 0) {
+    //   const seed = chunk[0]?.aid ?? 0;
+    //   const insertAt = seed % (pairs.length + 1);
+    //   pairs.splice(insertAt, 0, {
+    //     type: 'live',
+    //     left: liveRooms[roomIdx],
+    //   });
+    //   roomIdx++;
+    // }
+
+
+    if (rows.length < 20) {
+      rows.push({ type: 'big', item: bigItem }, ...pairs);
+    } else {
+      rows.push(...pairs, { type: 'big', item: bigItem });
+    }
   }
   return rows;
 }

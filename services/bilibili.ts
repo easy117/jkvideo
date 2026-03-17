@@ -337,6 +337,18 @@ export async function searchVideos(keyword: string, page = 1): Promise<VideoItem
     } as VideoItem));
 }
 
+export async function getLiveDanmakuInfo(roomId: number): Promise<{ token: string; host: string }> {
+  const res = await api.get(`${LIVE_BASE}/room/v1/Danmu/getConf`, {
+    params: { room_id: roomId, platform: 'h5' },
+  });
+  const data = res.data.data;
+  const hostInfo = data?.host_server_list?.[0];
+  const host = hostInfo
+    ? `wss://${hostInfo.host}:${hostInfo.wss_port}/sub`
+    : 'wss://broadcastlv.chat.bilibili.com/sub';
+  return { token: data?.token ?? '', host };
+}
+
 export async function getDanmaku(cid: number): Promise<DanmakuItem[]> {
   try {
     if (isWeb) {
@@ -354,7 +366,7 @@ export async function getDanmaku(cid: number): Promise<DanmakuItem[]> {
       responseType: 'arraybuffer',
     });
 
-  const bytes = new Uint8Array(res.data as ArrayBuffer);
+    const bytes = new Uint8Array(res.data as ArrayBuffer);
     let xmlText: string | undefined;
 
     // 依次尝试：inflate (gzip/zlib) → inflateRaw (raw deflate)
