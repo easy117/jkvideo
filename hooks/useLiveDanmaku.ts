@@ -123,6 +123,8 @@ export function useLiveDanmaku(roomId: number): DanmakuItem[] {
         const info = await getLiveDanmakuInfo(roomId);
         token = info.token;
         host = info.host;
+
+
       } catch (e) {
         console.warn('[danmaku] getDanmuInfo failed:', e);
       }
@@ -144,19 +146,18 @@ export function useLiveDanmaku(roomId: number): DanmakuItem[] {
       wsRef.current = ws;
 
       ws.onopen = () => {
+
         const authBody = JSON.stringify({
           uid: 0,
           roomid: roomId,
           protover: 2,
-          platform: 'h5',  // must match platform param used in getConf API call
+          platform: 'h5',
           type: 2,
           key: token,
         });
         const authPkt = buildPacket(authBody, 7);
-        const hdr = Array.from(authPkt.slice(0, 16))
-          .map(b => b.toString(16).padStart(2, '0')).join(' ');
-        // Send as ArrayBuffer (more reliable than Uint8Array in some RN/Hermes versions)
-        const t0 = Date.now();
+
+
         ws.send(authPkt.buffer as ArrayBuffer);
 
         heartbeatRef.current = setInterval(() => {
@@ -171,10 +172,8 @@ export function useLiveDanmaku(roomId: number): DanmakuItem[] {
         if (items.length > 0) setDanmakus(prev => [...prev, ...items]);
       };
 
-      ws.onerror = (e: Event) => {
-        const ws2 = (e as any).currentTarget as WebSocket;
-      };
-      ws.onclose = (e: CloseEvent) => {
+      ws.onerror = () => {};
+      ws.onclose = () => {
         if (heartbeatRef.current) clearInterval(heartbeatRef.current);
       };
     }

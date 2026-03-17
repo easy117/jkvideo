@@ -261,7 +261,7 @@ export async function getLiveAnchorInfo(roomId: number): Promise<LiveAnchorInfo>
 export async function getLiveStreamUrl(roomId: number, qn = 10000): Promise<LiveStreamInfo> {
   try {
     const res = await api.get(`${LIVE_BASE}/xlive/web-room/v2/index/getRoomPlayInfo`, {
-      params: { room_id: roomId, protocol: '0,1', format: '0,1,2', codec: '0', qn },
+      params: { room_id: roomId, protocol: '0,1', format: '0,1,2', codec: '0', qn, platform: 'android' },
     });
     const playurl = res.data?.data?.playurl_info?.playurl;
     const streams: any[] = playurl?.stream ?? [];
@@ -338,11 +338,14 @@ export async function searchVideos(keyword: string, page = 1): Promise<VideoItem
 }
 
 export async function getLiveDanmakuInfo(roomId: number): Promise<{ token: string; host: string }> {
-  const res = await api.get(`${LIVE_BASE}/room/v1/Danmu/getConf`, {
-    params: { room_id: roomId, platform: 'h5' },
+  const { imgKey, subKey } = await getWbiKeys();
+  const signed = signWbi({ id: roomId, type: 0 }, imgKey, subKey);
+  const res = await api.get(`${LIVE_BASE}/xlive/web-room/v1/index/getDanmuInfo`, {
+    params: signed,
   });
   const data = res.data.data;
-  const hostInfo = data?.host_server_list?.[0];
+  const hostList: any[] = data?.host_list ?? [];
+  const hostInfo = hostList.find(h => h.wss_port === 443) ?? hostList[0];
   const host = hostInfo
     ? `wss://${hostInfo.host}:${hostInfo.wss_port}/sub`
     : 'wss://broadcastlv.chat.bilibili.com/sub';

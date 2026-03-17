@@ -30,6 +30,7 @@ export default function LiveDetailScreen() {
 
   const isLive = room?.live_status === 1;
   const hlsUrl = stream?.hlsUrl ?? "";
+  const flvUrl = stream?.flvUrl ?? "";
   const qualities = stream?.qualities ?? [];
   const currentQn = stream?.qn ?? 0;
 
@@ -51,6 +52,7 @@ export default function LiveDetailScreen() {
       {/* Player */}
       <LivePlayer
         hlsUrl={hlsUrl}
+        flvUrl={flvUrl}
         isLive={isLive}
         qualities={qualities}
         currentQn={currentQn}

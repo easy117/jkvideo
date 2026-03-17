@@ -62,7 +62,6 @@ const LIVE_AREAS = [
   { id: 9, name: "虚拟主播" },
   { id: 10, name: "生活" },
   { id: 11, name: "知识" },
-  { id: 13, name: "赛事" },
 ];
 
 export default function HomeScreen() {

@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 interface Props {
   hlsUrl: string;
+  flvUrl?: string;
   isLive: boolean;
   qualities?: { qn: number; desc: string }[];
   currentQn?: number;
@@ -27,7 +28,7 @@ const HEADERS = {
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
 };
 
-export function LivePlayer({ hlsUrl, isLive, qualities = [], currentQn = 0, onQualityChange }: Props) {
+export function LivePlayer({ hlsUrl, flvUrl, isLive, qualities = [], currentQn = 0, onQualityChange }: Props) {
   const { width: SCREEN_W, height: SCREEN_H } = useWindowDimensions();
   const VIDEO_H = SCREEN_W * 0.5625;
 
@@ -179,12 +180,6 @@ function NativeLivePlayer({
 
       {showControls && (
         <>
-          {/* LIVE badge top-left */}
-          <View style={styles.liveBadge} pointerEvents="none">
-            <View style={styles.liveDot} />
-            <Text style={styles.liveText}>live</Text>
-          </View>
-
           {/* Center play/pause */}
           <TouchableOpacity
             style={styles.centerBtn}
