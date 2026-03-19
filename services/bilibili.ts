@@ -425,3 +425,21 @@ export async function getDanmaku(cid: number): Promise<DanmakuItem[]> {
     return [];
   }
 }
+
+export async function getFollowedLiveRooms(): Promise<LiveRoom[]> {
+  const res = await api.get(`${LIVE_BASE}/xlive/web-ucenter/v1/xfetter/FeedList`, {
+    params: { page: 1, page_size: 10, platform: 'web' },
+  });
+  const list = res.data?.data?.list ?? [];
+  return list.map((r: any) => ({
+    roomid: r.room_id,
+    uid: r.uid,
+    title: r.title,
+    uname: r.uname,
+    face: r.face,
+    cover: r.cover || r.keyframe || '',
+    online: r.online ?? 0,
+    area_name: r.area_v2_name ?? '',
+    parent_area_name: r.area_v2_parent_name ?? '',
+  }));
+}

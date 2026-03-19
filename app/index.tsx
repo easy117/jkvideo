@@ -39,6 +39,7 @@ import {
   type LiveRow,
 } from "../utils/videoRows";
 import { BigVideoCard } from "../components/BigVideoCard";
+import { FollowedLiveStrip } from "../components/FollowedLiveStrip";
 import type { LiveRoom } from "../services/types";
 
 const HEADER_H = 44;
@@ -339,33 +340,36 @@ export default function HomeScreen() {
             }}
             renderItem={renderLiveItem}
             ListHeaderComponent={
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.areaTabRow}
-                contentContainerStyle={styles.areaTabContent}
-              >
-                {LIVE_AREAS.map((area) => (
-                  <TouchableOpacity
-                    key={area.id}
-                    style={[
-                      styles.areaTab,
-                      liveAreaId === area.id && styles.areaTabActive,
-                    ]}
-                    onPress={() => handleLiveAreaPress(area.id)}
-                    activeOpacity={0.7}
-                  >
-                    <Text
+              <View>
+                <FollowedLiveStrip />
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.areaTabRow}
+                  contentContainerStyle={styles.areaTabContent}
+                >
+                  {LIVE_AREAS.map((area) => (
+                    <TouchableOpacity
+                      key={area.id}
                       style={[
-                        styles.areaTabText,
-                        liveAreaId === area.id && styles.areaTabTextActive,
+                        styles.areaTab,
+                        liveAreaId === area.id && styles.areaTabActive,
                       ]}
+                      onPress={() => handleLiveAreaPress(area.id)}
+                      activeOpacity={0.7}
                     >
-                      {area.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+                      <Text
+                        style={[
+                          styles.areaTabText,
+                          liveAreaId === area.id && styles.areaTabTextActive,
+                        ]}
+                      >
+                        {area.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
             }
             refreshControl={
               <RefreshControl
