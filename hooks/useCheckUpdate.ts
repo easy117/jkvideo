@@ -60,6 +60,25 @@ export function useCheckUpdate() {
     }
   };
 
+  const openInstallSettings = () => {
+    IntentLauncher.startActivityAsync(
+      'android.settings.MANAGE_UNKNOWN_APP_SOURCES',
+      { data: 'package:com.anonymous.jkvideo' }
+    ).catch(() => {
+      // 部分旧版 Android 不支持精确跳转，回退到通用安全设置
+      IntentLauncher.startActivityAsync('android.settings.SECURITY_SETTINGS');
+    });
+  };
+
+  const triggerInstall = async (localUri: string) => {
+    const contentUri = await FileSystem.getContentUriAsync(localUri);
+    await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+      data: contentUri,
+      flags: 1,
+      type: 'application/vnd.android.package-archive',
+    });
+  };
+
   const downloadAndInstall = async (url: string, version: string) => {
     if (Platform.OS !== 'android') {
       Alert.alert('提示', '自动安装仅支持 Android 设备');
@@ -83,12 +102,19 @@ export function useCheckUpdate() {
       await downloadResumable.downloadAsync();
       setDownloadProgress(null);
 
-      const contentUri = await FileSystem.getContentUriAsync(localUri);
-      await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-        data: contentUri,
-        flags: 1,
-        type: 'application/vnd.android.package-archive',
-      });
+      try {
+        await triggerInstall(localUri);
+      } catch {
+        // 无安装未知来源权限，引导用户开启后手动重试
+        Alert.alert(
+          '需要安装权限',
+          '请在打开的设置页中，为 JKVideo 开启「允许安装未知应用」，然后回来再次点击「下载安装」。',
+          [
+            { text: '取消', style: 'cancel' },
+            { text: '去设置', onPress: openInstallSettings },
+          ]
+        );
+      }
     } catch (e: any) {
       setDownloadProgress(null);
       Alert.alert('下载失败', e?.message ?? '请稍后重试');
