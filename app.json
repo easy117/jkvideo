@@ -2,7 +2,7 @@
   "expo": {
     "name": "JKVideo",
     "slug": "jsvideo",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "scheme": "bilibili",
     "orientation": "default",
     "icon": "./assets/icon.png",
@@ -41,12 +41,12 @@
       "expo-router",
       "react-native-video",
       "expo-screen-orientation",
-"@sentry/react-native/expo"
+      "@sentry/react-native/expo"
     ],
     "experiments": {
       "typedRoutes": true
     },
-"extra": {
+    "extra": {
       "router": {},
       "eas": {
         "projectId": "eac4192a-ae80-461c-8fff-6e1a8b777bd1"
